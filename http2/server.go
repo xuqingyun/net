@@ -892,6 +892,7 @@ func (sc *serverConn) serve() {
 					sc.vlogf("GOAWAY close timer fired; closing conn from %v", sc.conn.RemoteAddr())
 					return
 				case gracefulShutdownMsg:
+					sc.logf("start graceful shutdown, send GOAWAY to %v", sc.conn.RemoteAddr())
 					sc.startGracefulShutdownInternal()
 				default:
 					panic("unknown timer")
@@ -2530,8 +2531,9 @@ func (rws *responseWriterState) writeChunk(p []byte) (n int, err error) {
 // prior to the headers being written. If the set of trailers is fixed
 // or known before the header is written, the normal Go trailers mechanism
 // is preferred:
-//    https://golang.org/pkg/net/http/#ResponseWriter
-//    https://golang.org/pkg/net/http/#example_ResponseWriter_trailers
+//
+//	https://golang.org/pkg/net/http/#ResponseWriter
+//	https://golang.org/pkg/net/http/#example_ResponseWriter_trailers
 const TrailerPrefix = "Trailer:"
 
 // promoteUndeclaredTrailers permits http.Handlers to set trailers
